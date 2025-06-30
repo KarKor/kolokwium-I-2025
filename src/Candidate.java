@@ -3,4 +3,5 @@ public record Candidate(String name) {
     public String toString() {
         return name;
     }
+
 }

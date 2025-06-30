@@ -1,15 +1,24 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Vote {
     private static Map<Candidate, Integer> votesForCandidate = new HashMap<>();
-    private List<String> location = new ArrayList<>();
+    private static List<String> location = new ArrayList<>();
 
     public Vote(List<String> location, Map<Candidate, Integer> votesForCandidate) {
         this.location = location;
         this.votesForCandidate = votesForCandidate;
+    }
+
+    public List<String> getLocation() {
+        return location;
+    }
+
+    public static void setLocation(List<String> location) {
+        Vote.location = location;
+    }
+
+    public static Map<Candidate, Integer> getVotesForCandidate() {
+        return votesForCandidate;
     }
 
     public static Vote summarize(List<Vote> votes){
@@ -23,25 +32,33 @@ public class Vote {
         return new Vote(new ArrayList<String>(),forCandidate);
     }
 
+    // w klasie Vote
+    public static Vote summarize(List<Vote> votes, List<String> location) {
+        Vote summary = summarize(votes); // zakładamy, że istnieje już metoda summarize(List<Vote>)
+        summary.setLocation(location);   // metoda setLocation ustawia lokalizację w obiekcie Vote
+        return summary;
+    }
+
+
+
     public Integer votes(Candidate candidate){
         Integer voteCount = votesForCandidate.get(candidate);
         return voteCount;
     }
 
     public double percentage(Candidate candidate){
-        Integer sum = 0;
+        int sum = 0;
         for (int count : votesForCandidate.values()) { //pętla sumująca wszystkie wartości z mapy
             sum += count;
         }
         Integer voteCount = votesForCandidate.get(candidate);
 
         if(sum ==0 || voteCount == null) return 0.0;
-        double percentage = ((double) voteCount / sum)*100.00;
-        return percentage;
+        return ((double) voteCount / sum)*100.00;
     }
 
     public Integer getVoteSum(){
-        Integer sum = 0;
+        int sum = 0;
         for (int count : votesForCandidate.values()) { //pętla sumująca wszystkie wartości z mapy
             sum += count;
         }
@@ -55,7 +72,7 @@ public class Vote {
         for(Map.Entry<Candidate, Integer> entry : votesForCandidate.entrySet()){
             double percent = sum == 0 ? 0.0 : (double) votes(entry.getKey()) / sum * 100.0;
             sb.append(String.valueOf(entry.getKey()));
-            sb.append(": " + String.format("%.2f", percent) + "%\n");
+            sb.append(": ").append(String.format("%.2f", percent)).append("%\n");
         }
         return sb.toString();
     }
@@ -82,5 +99,35 @@ public class Vote {
         vote = new Vote(loc, votes);
 
         return vote;
+    }
+
+    public static List<Vote> filterByLocation(List<Vote> votes, List<String> locations){
+        List<Vote> filtered = new ArrayList<>();
+        if(locations.size()==1){
+            for(Vote vote: votes) {
+                if (Objects.equals(vote.getLocation().getFirst(), locations.getFirst())) {
+                    filtered.add(vote);
+                }
+            }
+        } else if (locations.size()==2) {
+            for(Vote vote: votes) {
+                if (Objects.equals(vote.getLocation().get(0), locations.get(0))
+                && Objects.equals(vote.getLocation().get(1), locations.get(1))) {
+                    filtered.add(vote);
+                }
+            }
+        } else if (locations.size()==3) {
+            for(Vote vote: votes) {
+                if (Objects.equals(vote.getLocation().get(0), locations.get(0))
+                        && Objects.equals(vote.getLocation().get(1), locations.get(1))
+                        && Objects.equals(vote.getLocation().get(2), locations.get(2))) {
+                    filtered.add(vote);
+                }
+            }
+
+        }
+
+        if(filtered.isEmpty()) System.out.println("No matches found");
+        return filtered;
     }
 }

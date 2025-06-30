@@ -8,6 +8,13 @@ public class Election {
     private List<Candidate> candidates = new ArrayList<>();
     private ElectionTurn firstTurn = new ElectionTurn(candidates);
     private ElectionTurn secondTurn = null;
+    private List<Candidate> runoffs = new ArrayList<>();
+
+    private Candidate winner;
+
+    public Candidate getWinner() {
+        return winner;
+    }
 
     public List<Candidate> getCandidates() {
         return candidates;
@@ -46,6 +53,23 @@ public class Election {
 
         firstTurn.populate("1.csv");
 
+        try{
+            winner = firstTurn.winner();
+        }catch (NoWinnerException e) {
+            System.out.println(e.getMessage());
+            runoffs = firstTurn.runOffCandidates();
+            secondTurn = new ElectionTurn(runoffs);
+            secondTurn.populate("2.csv");
+        }
+        try {
+            if(secondTurn!=null) {
+                winner = secondTurn.winner();
+            }
+        }catch (NoWinnerException e){
+            System.out.println(e.getMessage());
+        };
 
     }
+
+
 }

@@ -14,7 +14,6 @@ public class Main {
 
         Vote summarized = Vote.summarize(votes);
         System.out.println(summarized.toString());
-
     }
 
     public static List<Vote> readCsv(String filePath, List<Candidate> candidates){
